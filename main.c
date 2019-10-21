@@ -1,8 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <string.h> 
+#include <string.h>
+#include <locale.h>
+
 #define TAMMAX 100
+
+#define localeC setlocale(LC_ALL,"C");
+#define localeP setlocale(LC_ALL,"Portuguese");
 
 // Propriedades do teatro
 char 			TeatroNome[] = "Municipal";
@@ -71,9 +76,11 @@ void PrintLugares(){
 
 	int numeroPoltrona = 1;
 	printf("\t ===================== TELA ===================== \n\n");
-	for(int count = 1; count <= 10; count++){
+	int count;
+	for(count = 1; count <= 10; count++){
 		printf("\t");
-		for(int fileira = 1; fileira<=10; fileira++){
+		int fileira;
+		for(fileira = 1; fileira<=10; fileira++){
 			printf(" %.3d ", numeroPoltrona);
 			numeroPoltrona++;
 		}
@@ -84,13 +91,15 @@ void PrintLugares(){
 }
 
 int main (int argc, char** argv)
-{    
+{
+	localeP;
+	system("color F0");
     do {
     	
     	system("cls");
     	
     	printf(" =========== Bem-vindo ao teatro %s =========== \n\n", TeatroNome);
-    	printf("\t 1 - Definir Pecas\n");
+    	printf("\t 1 - Definir Peças\n");
     	printf("\t 2 - Ver Pecas\n");
 		printf("\t 3 - Comprar Ingresso\n");
 		printf("\t 4 - Cancelar Ingresso\n");
