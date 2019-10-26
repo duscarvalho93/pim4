@@ -216,9 +216,9 @@ void menu(){//Menu inicial
 		int OptSpc = 3; // Espaçamento entre as opções
 		int OptTotal = 6; // Total de opções do menu
 		    	
-    	int mY = OptFY;                                      //
+    	int mY = OptFY;                                              
 		gotoPrintMenu(OptX,mY, "Definir Peças");             //
-    	gotoPrintMenu(OptX,mY+=OptSpc, "Ver Pecas");         //
+    	gotoPrintMenu(OptX,mY+=OptSpc, "Ver Pecas");                 //
 		gotoPrintMenu(OptX,mY+=OptSpc, "Comprar Ingresso");  // Opções do menu inicial
 		gotoPrintMenu(OptX,mY+=OptSpc, "Cancelar Ingresso"); //
 		gotoPrintMenu(OptX,mY+=OptSpc, "Faturar");           //
