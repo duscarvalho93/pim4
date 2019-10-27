@@ -15,11 +15,11 @@ int				OpcaoPrincipal = 0;
 
 
 // Controle das peças
-char 			PecaUmNome[TAMMAX] = "Nao definida";
+char 			PecaUmNome[TAMMAX] = "Peça não definida";
 float			PecaUmValor;
-char 			PecaDoisNome[TAMMAX] = "Nao definida";
+char 			PecaDoisNome[TAMMAX] = "Peça não definida";
 float			PecaDoisValor;
-char 			PecaTresNome[TAMMAX] = "Nao definida";
+char 			PecaTresNome[TAMMAX] = "Peça não definida";
 float			PecaTresValor;
 int				OpcaoPeca = 0;
 
@@ -32,7 +32,7 @@ void menu();
 #define tclENTER  13
 #define tclUP     72
 #define tclDOWN   80
-#define SETA	  26
+#define SETA	  62
 
 void gotoxy(int x,int y){
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE),(COORD){x,y}); // x=j (sao colunas) e y=i (sao as linhas)
@@ -66,6 +66,7 @@ int newMenuNav(int OptFY, int OptSpc, int OptX, int OpcTotal){
 	cursor(0);
 	
 	do {
+		
 		gotoxy(OptX-4,Y);printf("%c", SETA); //primeira seta (26 é o caractere '->')
 		decimalChar=getch();
 		gotoxy(OptX-4,Y); printf(" "); //limpa a seta quando muda de linha
@@ -83,9 +84,9 @@ int newMenuNav(int OptFY, int OptSpc, int OptX, int OpcTotal){
 			case tclDOWN : // seta para baixo
 				Y += OptSpc;//soma valor nas cordenadas para mudar linha
 				Option++;
-				if(Y>LastLine){ //se passar da primeira ultima do menu volta pro topo
+				if(Y>LastLine){ //se passar da ultima do menu volta pro topo
 					Y=OptFY;
-					Option=OpcTotal;
+					Option=1;
 				}
 				gotoxy(OptX-4,Y); printf("%c", SETA);
 				break;
@@ -98,10 +99,25 @@ int newMenuNav(int OptFY, int OptSpc, int OptX, int OpcTotal){
 // Fim das funções de seta dos menus
 
 // Funções de controle das peças
+void DefinirSalaIn(char NomeSala[TAMMAX]){
+	gotoxy(20,2);printf(" ========== %s =============\n", NomeSala);
+	gotoPrintMenu(20,4, " Insira os dados da peça");
+	gotoPrintMenu(20,6, " Nome: ");
+	gotoPrintMenu(20,7, " Valor: ");
+	cursor(1);
+	gotoxy(27, 6);
+}
+void DefinirSalaOut(char NomeSala[TAMMAX], char NomePeca[TAMMAX], float ValorPeca){
+	gotoxy(21, 10);printf("%s definida", NomeSala);
+	gotoxy(21, 11);printf("Nome: %s", NomePeca);
+	gotoxy(21, 12);printf("Valor: R$ %.2f \n\n\n", ValorPeca);
+	cursor(0);
+}
 void DefinirPecas(){
 	do {
 		
 		system("cls");
+		setbuf(stdin, NULL);
 		
 		gotoPrintMenu(10,2, " =========== Escolha as salas e suas respectivas peças ===========");
 		
@@ -116,9 +132,10 @@ void DefinirPecas(){
 		gotoPrintMenu(OptX,mY+=OptSpc, "Sala 3");
 		gotoPrintMenu(OptX,mY+=OptSpc, "Voltar ao menu principal");
 		gotoPrintMenu(10,17, " ========== Nome das peças escolhidas e suas salas =============\n");
-		printf("\nSala 1: %s R$%.2f",PecaUmNome,PecaUmValor);
-		printf("\nSala 2: %s R$%.2f",PecaDoisNome,PecaDoisValor);
-		printf("\nSala 3: %s R$%.2f",PecaTresNome,PecaTresValor);
+		
+		gotoxy(27,20);printf("Sala 1: %s R$ %.2f",PecaUmNome,PecaUmValor);
+		gotoxy(27,21);printf("Sala 2: %s R$%.2f",PecaDoisNome,PecaDoisValor);
+		gotoxy(27,22);printf("Sala 3: %s R$%.2f",PecaTresNome,PecaTresValor);
 		
 		OpcaoPeca = newMenuNav(OptFY, OptSpc, OptX, OptTotal);
 		
@@ -126,43 +143,37 @@ void DefinirPecas(){
 			
 		switch(OpcaoPeca){
 			case 1:
-				printf("\t *Peça 1: Escolha a peça e seu valor*\n");
-				printf("\nDigite o nome da peca: ");
+				DefinirSalaIn("SALA 1");
 				fgets(PecaUmNome, TAMMAX, stdin);
-				printf("\n--Peça escolhida: %s",PecaUmNome);
-				printf("\nDigite o valor da peca: ");
+				PecaUmNome[strlen(PecaUmNome)-1] = '\0';
+				cursor(1);
+				gotoxy(28,7);
 				scanf("%f", &PecaUmValor);
-				printf("\n--Valor que será cobrado: R$%.2f",PecaUmValor);
-				printf("\nPressione enter para continuar");
+				DefinirSalaOut("SALA 1", PecaUmNome, PecaUmValor);
 				OpcaoPeca = 0;
-				getch();
-//				DefinirPecas();
+				system("pause");
 			break;
 			case 2:
-				printf("\t *Peça 2: Escolha a peça e seu valor*\n");
-				printf("\nDigite o nome da peca: ");
+				DefinirSalaIn("SALA 2");
 				fgets(PecaDoisNome, TAMMAX, stdin);
-				printf("\n--Peça escolhida: %s",PecaDoisNome);
-				printf("\nDigite o valor da peca: ");
+				PecaDoisNome[strlen(PecaDoisNome)-1] = '\0';
+				cursor(1);
+				gotoxy(28,7);
 				scanf("%f", &PecaDoisValor);
-				printf("\n--Valor que será cobrado: R$%.2f",PecaDoisValor);
-				printf("\nPressione enter para continuar");
+				DefinirSalaOut("SALA 2", PecaDoisNome, PecaDoisValor);
 				OpcaoPeca = 0;
-				getch();
-//				DefinirPecas();
-				break;		
+				system("pause");
+			break;		
 			case 3:
-				printf("\t *Peça 3: Escolha a peça e seu valor*\n");
-				printf("\nDigite o nome da peca: ");
+				DefinirSalaIn("SALA 3");
 				fgets(PecaTresNome, TAMMAX, stdin);
-				printf("\n--Peça escolhida: %s",PecaTresNome);
-				printf("\nDigite o valor da peca: ");
+				PecaTresNome[strlen(PecaTresNome)-1] = '\0';
+				cursor(1);
+				gotoxy(28,7);
 				scanf("%f", &PecaTresValor);
-      			printf("\n--Valor que será cobrado: R$%.2f",PecaTresValor);
-      			printf("\nPressione enter para contuinuar");
+				DefinirSalaOut("SALA 3", PecaTresNome, PecaTresValor);
 				OpcaoPeca = 0;
-				getch();
-//				DefinirPecas();	
+				system("pause");
 			break;		
 		}
 	} while(OpcaoPeca<4);
@@ -199,6 +210,38 @@ void PrintLugares(){
 	system("pause");
 }
 
+int escolherPeca(){
+	gotoPrintMenu(20,2, " =========== Escolha uma peça  ===========");
+	int OptX = 33; // Coordenada X que vai começar o print
+	int OptFY = 5; // Coordenada Y para a linha da primeira opção
+	int OptSpc = 3; // Espaçamento entre as opções
+	int OptTotal = 4; // Total de opções do menu
+	int mY = OptFY;                                              
+	gotoxy(OptX,mY);printf("%s", PecaUmNome);
+	gotoxy(OptX,mY+=OptSpc);printf("%s", PecaDoisNome);
+	gotoxy(OptX,mY+=OptSpc);printf("%s", PecaTresNome);
+	gotoPrintMenu(OptX,mY+=OptSpc, "Voltar ao menu principal");
+	int peca;
+	peca = newMenuNav(OptFY, OptSpc, OptX, OptTotal);
+	return peca;
+}
+
+void ComprarIngresso(){
+	system("cls");
+	
+	int peca;
+	
+	peca = escolherPeca();
+}
+
+// Fim do controle dos ingressos
+
+void bye(){
+	system("cls");
+	gotoPrintMenu(32, 10, "Até a próxima");
+	printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+}
+
 void menu(){//Menu inicial
 	
 	system("cls");
@@ -208,6 +251,8 @@ void menu(){//Menu inicial
 	int Option;
     
 	do {
+		
+		system("cls");
 		
 		gotoPrintMenu(20,2, " =========== Bem-vindo ao teatro  ===========");
 		
@@ -225,22 +270,33 @@ void menu(){//Menu inicial
 		gotoPrintMenu(OptX,mY+=OptSpc, "Encerrar o Sistema");//
 		
 		Option = newMenuNav(OptFY, OptSpc, OptX, OptTotal);
-	//Opções disponiveis até o momento	
+		
+		//Opções disponiveis até o momento	
 		switch(Option){
 			case 1:
 				DefinirPecas();
-				break;
+			break;
 			case 2:
 				VerPecas();
-				break;
+			break;
+			case 3:
+				ComprarIngresso();
+			break;
+			case 6:
+				bye();
+				Option = 7;
+			break;
 		}
 				
-	} while(Option!=6);
+	} while(Option<=6);
 	
 	
 }//Fim do Menu Inicial
 int main (int argc, char** argv)
 {
+    HWND wh = GetConsoleWindow();
+    MoveWindow(wh, 200, 100, 900, 400, TRUE);
+    
 	system("cls");
 	menu();
 	system("exit");
