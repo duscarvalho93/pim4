@@ -30,6 +30,9 @@ int totalPecas		= 3;
 // Função menu
 void menu();
 
+// print lugares
+void PrintLugares(int lugares[100], bool inv = false);
+
 // Funções para setas nos menus
 
 #define tclENTER  13
@@ -233,21 +236,37 @@ void DefinirPecas(){
 
 void VerPecas(){ // menu para ver as peças escolhidas
 	system("cls");
-	gotoxy(10, 2);
-	printf(" =========== Peças em cartaz =========== \n\n");
+	int l = 2;
+	gotoxy(8, l);
+	printf(" ====================== Peças em cartaz ====================== ");
 	for(int i=0; i<totalPecas;i++){
-		gotoxy(12, i+4);
-		printf("%s (Sala %d) R$ %.2f \n\n", Pecas[i].nome, i+1, Pecas[i].valor);
+		gotoxy(8, l+2);
+		
+		SetColor(1);
+		printf("%s", Pecas[i].nome);
+		SetColor(0);
+		
+		gotoxy(8, l+4);
+		printf(" SALA %d                         %.2f", i, Pecas[i].valor);
+		
+		gotoxy(0, l+6);
+		PrintLugares(Pecas[i].lugares);
+		
+		l+=18;
+		gotoxy(8, l+2);
+		printf("=================================================");
+		l+= 5;
+
 	}
-	gotoxy(12, 12);
-	printf("======================================= \n\n\n\n");	
+
+	printf("\n\n\n");
 	system("pause");
 }
 // Fim do controle das peças
 
 // Controle dos ingressos
 
-void PrintLugares(int lugares[100], bool inv = false){
+void PrintLugares(int lugares[100], bool inv){
 
 	int numeroPoltrona = 1;
 	printf("\t ===================== TELA ===================== \n\n");
@@ -317,20 +336,24 @@ int escolherTipoIngresso(){
 
 void ComprarIngresso(int peca);
 void CancelarIngresso(int peca);
+void ComprarIngressoTicket(int peca, int lugar, int tpIng);
 
-void IngressoSucesso(int peca, int opt = 0){
+void IngressoSucesso(int peca, int opt = 0, int lugar = 0, int tpIng = 0){
 	dataBaseSavePecas();
 	system("cls");
+	int lYN = 7;
 	if(opt==0){
-		gotoxy(15, 2); printf("========= Ingresso comprado com sucesso ===========");
-		gotoxy(15, 4); printf("Deseja comprar outro ingresso na mesma sala?");
+		gotoxy(18, 2); printf("========= Ingresso comprado com sucesso ===========");
+		ComprarIngressoTicket(peca, lugar, tpIng);
+		lYN = 22;
+		gotoxy(18, 18); printf("Deseja comprar outro ingresso na mesma sala?");
 	} else {
 		gotoxy(15, 2); printf("========= Ingresso cancelado com sucesso ===========");
 		gotoxy(15, 4); printf("Deseja cancelar outro ingresso na mesma sala?");
 	}
 
 	int response;
-	response = newMenuYN();
+	response = newMenuYN(lYN);
 
 	if(response==1){
 		if(opt==0){
@@ -342,13 +365,32 @@ void IngressoSucesso(int peca, int opt = 0){
 	
 }
 
+void ComprarIngressoTicket(int peca, int lugar, int tpIng){
+	srand(time(NULL));
+	int id = rand();
+	float valor = 0;
+	if(tpIng==1){
+		valor = Pecas[peca-1].valor;
+	} else if(tpIng==2){
+		valor = Pecas[peca-1].valor/2;
+	} else {
+		valor = 0;
+	}
+	gotoxy(20, 4);printf("==============  Ticket %d  =============", id);
+	
+	gotoxy(21, 8);printf("Sala ___________________________ Sala %d", peca);
+	gotoxy(21, 10);printf("Peça ___________________________ %s", Pecas[peca-1].nome);
+	gotoxy(21, 12);printf("Poltrona _______________________ %d", lugar);
+	gotoxy(21, 14);printf("Valor __________________________ %.2f", valor);
+}
+
 void ComprarIngresso(int pc = 0){
 
 	system("cls");
 	
 	int peca;
 	int tpIngresso;
-	bool invalid;
+	bool invalid = true;
 
 	if(pc==0){
 		peca = escolherPeca();
@@ -365,9 +407,11 @@ void ComprarIngresso(int pc = 0){
 		return;
 	}
 	
+	int lugar;
+	
 	do {
 
-		int lugar;
+		lugar = 0;
 		int indPeca = peca-1;
 		int indLugar;
 		
@@ -389,7 +433,7 @@ void ComprarIngresso(int pc = 0){
 		}
 		
 	} while(invalid);
-	IngressoSucesso(peca);
+	IngressoSucesso(peca, 0, lugar, tpIngresso);
 	
 }
 void CancelarIngresso(int pc = 0){
