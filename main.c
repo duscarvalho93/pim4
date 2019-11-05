@@ -6,7 +6,7 @@
 #include <windows.h>
 #include <conio.h>
 #include <time.h>
-#define TAMMAX 100
+#define TAMMAX 255
 
 #define localeC setlocale(LC_ALL,"C");
 #define localeP setlocale(LC_ALL,"Portuguese");
@@ -22,6 +22,8 @@ struct Peca
     char 		nome[TAMMAX];  
     float 		valor; 
     int 		lugares[100];
+    int			hora;
+    int 		minuto;
 };
 
 struct Peca 		Pecas[3];
@@ -221,9 +223,14 @@ void DefinirPecas(){
 			cursor(1);
 			scanf("%f", &Pecas[indPeca].valor);
 			
-			gotoxy(21, 10);printf("SALA %d definida", OpcaoPeca);
-			gotoxy(21, 11);printf("Nome: %s", Pecas[indPeca].nome);
-			gotoxy(21, 12);printf("Valor: R$ %.2f \n\n\n", Pecas[indPeca].valor);
+			gotoPrintMenu(20,8, " Horário: ");
+			cursor(1);
+			scanf("%d:%d" , &Pecas[indPeca].hora,&Pecas[indPeca].minuto);
+			
+			gotoxy(21, 11);printf("SALA %d definida", OpcaoPeca);
+			gotoxy(21, 12);printf("Nome: %s", Pecas[indPeca].nome);
+			gotoxy(21, 13);printf("Valor: R$ %.2f", Pecas[indPeca].valor);
+			gotoxy(21, 14);printf("Hora: %d:%d \n\n\n\n", Pecas[indPeca].hora, Pecas[indPeca].minuto);
 			cursor(0);
 			
 			OpcaoPeca = 0;
@@ -247,7 +254,7 @@ void VerPecas(){ // menu para ver as peças escolhidas
 		SetColor(0);
 		
 		gotoxy(8, l+4);
-		printf(" SALA %d                         %.2f", i, Pecas[i].valor);
+		printf(" SALA %d às %d:%d                         %.2f", i+1, Pecas[i].hora, Pecas[i].minuto, Pecas[i].valor);
 		
 		gotoxy(0, l+6);
 		PrintLugares(Pecas[i].lugares);
@@ -346,7 +353,7 @@ void IngressoSucesso(int peca, int opt = 0, int lugar = 0, int tpIng = 0){
 		gotoxy(18, 2); printf("========= Ingresso comprado com sucesso ===========");
 		ComprarIngressoTicket(peca, lugar, tpIng);
 		lYN = 22;
-		gotoxy(18, 18); printf("Deseja comprar outro ingresso na mesma sala?");
+		gotoxy(18, 20); printf("Deseja comprar outro ingresso na mesma sala?");
 	} else {
 		gotoxy(15, 2); printf("========= Ingresso cancelado com sucesso ===========");
 		gotoxy(15, 4); printf("Deseja cancelar outro ingresso na mesma sala?");
@@ -366,7 +373,11 @@ void IngressoSucesso(int peca, int opt = 0, int lugar = 0, int tpIng = 0){
 }
 
 void ComprarIngressoTicket(int peca, int lugar, int tpIng){
+	
 	srand(time(NULL));
+	time_t t = time(NULL);
+  	struct tm tm = *localtime(&t);
+  	
 	int id = rand();
 	float valor = 0;
 	if(tpIng==1){
@@ -378,10 +389,12 @@ void ComprarIngressoTicket(int peca, int lugar, int tpIng){
 	}
 	gotoxy(20, 4);printf("==============  Ticket %d  =============", id);
 	
-	gotoxy(21, 8);printf("Sala ___________________________ Sala %d", peca);
+	gotoxy(21,  8);printf("Sala ___________________________ %d", peca);
 	gotoxy(21, 10);printf("Peça ___________________________ %s", Pecas[peca-1].nome);
 	gotoxy(21, 12);printf("Poltrona _______________________ %d", lugar);
 	gotoxy(21, 14);printf("Valor __________________________ %.2f", valor);
+	gotoxy(21, 16);printf("Data ___________________________ %d/%d/%d", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900);
+	gotoxy(21, 18);printf("Horário_________________________ %d:%d", Pecas[peca-1].hora, Pecas[peca-1].minuto);
 }
 
 void ComprarIngresso(int pc = 0){
