@@ -5,6 +5,7 @@
 #include <locale.h>
 #include <windows.h>
 #include <conio.h>
+#include <time.h>
 #define TAMMAX 100
 
 #define localeC setlocale(LC_ALL,"C");
@@ -25,14 +26,6 @@ struct Peca
 
 struct Peca 		Pecas[3];
 int totalPecas		= 3;
-
-char 			PecaUmNome[TAMMAX] = "Peça não definida";
-float			PecaUmValor;
-char 			PecaDoisNome[TAMMAX] = "Peça não definida";
-float			PecaDoisValor;
-char 			PecaTresNome[TAMMAX] = "Peça não definida";
-float			PecaTresValor;
-int				OpcaoPeca = 0;
 
 // Função menu
 void menu();
@@ -106,9 +99,40 @@ int newMenuNav(int OptFY, int OptSpc, int OptX, int OpcTotal){
 	return(Option);
 }
 
+int newMenuYN(int x = 7){
+	int OptX = 33; // Coordenada X que vai começar o print
+	int OptFY = x; // Coordenada Y para a linha da primeira opção
+	int OptSpc = 3; // Espaçamento entre as opções
+	int OptTotal = 2; // Total de opções do menu
+	int mY = OptFY;                                              
+	gotoxy(OptX,mY);printf("Sim");
+	gotoxy(OptX,mY+=OptSpc);printf("Não");
+	
+	return newMenuNav(OptFY, OptSpc, OptX, OptTotal);
+}
+
 // Fim das funções de seta dos menus
 
 // Colors
+
+/*
+Black        |   0
+Blue         |   1
+Green        |   2
+Cyan         |   3
+Red          |   4
+Magenta      |   5
+Brown        |   6
+Light Gray   |   7
+Dark Gray    |   8
+Light Blue   |   9
+Light Green  |   10
+Light Cyan   |   11
+Light Red    |   12
+Light Magenta|   13
+Yellow       |   14
+White        |   15
+*/
  void SetColor(int ForgC)
  {
      WORD wColor;
@@ -153,6 +177,7 @@ void dataBaseGetPecas(){
 }
 
 void DefinirPecas(){
+	int OpcaoPeca;
 	do {
 		
 		system("cls");
@@ -222,7 +247,7 @@ void VerPecas(){ // menu para ver as peças escolhidas
 
 // Controle dos ingressos
 
-void PrintLugares(int lugares[100]){
+void PrintLugares(int lugares[100], bool inv = false){
 
 	int numeroPoltrona = 1;
 	printf("\t ===================== TELA ===================== \n\n");
@@ -231,13 +256,24 @@ void PrintLugares(int lugares[100]){
 		printf("\t");
 		int fileira;
 		for(fileira = 1; fileira<=10; fileira++){
-			if(lugares[numeroPoltrona-1]>0){
-				SetColor(7);
-				printf(" OCP ");
-				SetColor(0);
+			if(inv){
+				if(lugares[numeroPoltrona-1]==0){
+					SetColor(1);
+					printf(" LVR ");
+					SetColor(0);
+				} else {
+					printf(" %.3d ", numeroPoltrona);
+				}
 			} else {
-				printf(" %.3d ", numeroPoltrona);
+				if(lugares[numeroPoltrona-1]>0){
+					SetColor(7);
+					printf(" OCP ");
+					SetColor(0);
+				} else {
+					printf(" %.3d ", numeroPoltrona);
+				}
 			}
+
 			numeroPoltrona++;
 		}
 		printf("\n");		
@@ -261,8 +297,6 @@ int escolherPeca(){
 	peca = newMenuNav(OptFY, OptSpc, OptX, OptTotal);
 	return peca;
 }
-
-int LugaresSala1[100];
 
 int escolherTipoIngresso(){
 	system("cls");
@@ -295,17 +329,9 @@ void IngressoSucesso(int peca, int opt = 0){
 		gotoxy(15, 4); printf("Deseja cancelar outro ingresso na mesma sala?");
 	}
 
-	
-	int OptX = 33; // Coordenada X que vai começar o print
-	int OptFY = 7; // Coordenada Y para a linha da primeira opção
-	int OptSpc = 3; // Espaçamento entre as opções
-	int OptTotal = 2; // Total de opções do menu
-	int mY = OptFY;                                              
-	gotoxy(OptX,mY);printf("Sim");
-	gotoxy(OptX,mY+=OptSpc);printf("Não");
-
 	int response;
-	response = newMenuNav(OptFY, OptSpc, OptX, OptTotal);
+	response = newMenuYN();
+
 	if(response==1){
 		if(opt==0){
 			ComprarIngresso(peca);
@@ -317,12 +343,12 @@ void IngressoSucesso(int peca, int opt = 0){
 }
 
 void ComprarIngresso(int pc = 0){
+
 	system("cls");
-	
 	
 	int peca;
 	int tpIngresso;
-	int invalid = 1;
+	bool invalid;
 
 	if(pc==0){
 		peca = escolherPeca();
@@ -332,11 +358,9 @@ void ComprarIngresso(int pc = 0){
 	} else {
 		peca = pc;
 	}
-	
-	printf("%d", peca);
-	system("pause");
 
 	tpIngresso = escolherTipoIngresso();
+	
 	if(tpIngresso==4){
 		return;
 	}
@@ -360,12 +384,12 @@ void ComprarIngresso(int pc = 0){
 		indLugar = lugar-1;
 		
 		if(Pecas[indPeca].lugares[indLugar]==0 && lugar<=100){
-			invalid = 0;
+			invalid = false;
 			Pecas[indPeca].lugares[indLugar] = tpIngresso;
 		}
 		
-	} while(invalid == 1);
-	//IngressoSucesso(peca);
+	} while(invalid);
+	IngressoSucesso(peca);
 	
 }
 void CancelarIngresso(int pc = 0){
@@ -389,11 +413,11 @@ void CancelarIngresso(int pc = 0){
 		
 		system("cls");
 		
-		gotoPrintMenu(5,2, " ===== Escolha o numero da sua poltrona que deseja cancelar  =====");
+		gotoPrintMenu(5,2, " ===== Escolha o numero da poltrona que deseja cancelar  =====");
 		
 		gotoxy(0, 4);
 		
-		PrintLugares(Pecas[indPeca].lugares);
+		PrintLugares(Pecas[indPeca].lugares, true);
 		gotoxy(6, 20);printf("Poltrona: ");
 		cursor(1);
 		scanf("%d", &lugar);
@@ -410,6 +434,69 @@ void CancelarIngresso(int pc = 0){
 }
 // Fim do controle dos ingressos
 
+// Faturamento
+
+void faturamento(){
+	system("cls");
+	gotoPrintMenu(25,2, " ===== FATURAMENTO  =====");
+	gotoPrintMenu(15,4, " Essa opção irá calcular o valor obtivo no dia ");
+	gotoPrintMenu(15,5, "   e irá definir todos os lugares como livre. ");
+	gotoxy(15, 6);printf("===============================================");
+	gotoPrintMenu(15,7, " Tem certeza que deseja continuar? ");
+	
+	int response;
+	response = newMenuYN(10);
+	
+	if(response==1){
+		int totalInteira = 0, totalMeia = 0, totalFree = 0;
+		float total;
+		for(int i=0; i<totalPecas; i++){
+			
+			float valor = Pecas[i].valor;
+			
+			for(int j = 0; j<100; j++){
+				switch(Pecas[i].lugares[j]){
+					case 1:
+						total += valor;
+						totalInteira++;
+					break;
+					case 2:
+						total += valor/2;
+						totalMeia++;
+					break;
+					case 3:
+						totalFree++;
+					break;
+				}
+				Pecas[i].lugares[j] = 0;
+			}
+		}
+		
+		dataBaseSavePecas();
+		system("cls");
+		
+		time_t t = time(NULL);
+  		struct tm tm = *localtime(&t);
+		
+		
+		gotoxy(10, 2);printf("Faturamento do dia %d/%d/%d", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900);
+		gotoxy(10, 4);printf("Total de entradas inteiras:");gotoxy(40, 4);printf("%d", totalInteira);
+		gotoxy(10, 5);printf("Total de meia entradas:");gotoxy(40, 5);printf("%d", totalMeia);
+		gotoxy(10, 6);printf("Total de entradas cedidas:");gotoxy(40, 6);printf("%d", totalFree);
+		
+		gotoxy(10, 8);printf("Valor total arrecadado:");gotoxy(40, 8);printf("%.2f", total);
+		
+		gotoxy(10, 10);printf("Todas as poltronas foram liberadas!");
+
+		gotoxy(0, 28);
+		system("pause");
+	}
+	
+
+}
+
+// Fim do faturamento
+
 void bye(){
 	system("cls");
 	gotoPrintMenu(32, 10, "Até a próxima");
@@ -417,7 +504,6 @@ void bye(){
 }
 
 void menu(){//Menu inicial
-	
 	system("cls");
 	system("color F0");
 	
@@ -442,7 +528,10 @@ void menu(){//Menu inicial
 		gotoPrintMenu(OptX,mY+=OptSpc, "Faturar");           //
 		gotoPrintMenu(OptX,mY+=OptSpc, "Encerrar o Sistema");//
 		
+		
+		
 		Option = newMenuNav(OptFY, OptSpc, OptX, OptTotal);
+		
 					
 		//Opções disponiveis até o momento	
 		switch(Option){
@@ -454,9 +543,12 @@ void menu(){//Menu inicial
 			break;
 			case 3:
 				ComprarIngresso();
+			break;
 			case 4:
 				CancelarIngresso();
 			break;
+			case 5:
+				faturamento();
 			break;
 			case 6:
 				bye();
