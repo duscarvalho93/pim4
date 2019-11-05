@@ -22,9 +22,9 @@ struct Peca
     char 		nome[TAMMAX];  
     float 		valor; 
     int 		lugares[100];
-    int			hora;
-    int 		minuto;
 };
+
+char				horarios[5][6] = {"12:00", "16:00", "20:00"};
 
 struct Peca 		Pecas[3];
 int totalPecas		= 3;
@@ -188,7 +188,7 @@ void DefinirPecas(){
 		system("cls");
 		setbuf(stdin, NULL);
 		
-		gotoPrintMenu(10,2, " =========== Escolha as salas e suas respectivas peças ===========");
+		gotoPrintMenu(10,2, " =========== Escolha os horários e suas respectivas peças ===========");
 		
 		int OptX = 33; // Coordenada X que vai começar o print
 		int OptFY = 5; // Coordenada Y para a linha da primeira opção
@@ -196,14 +196,14 @@ void DefinirPecas(){
 		int OptTotal = 4; // Total de opções do menu
 		    	
     	int mY = OptFY;
-		gotoPrintMenu(OptX,mY, "Sala 1");
-    	gotoPrintMenu(OptX,mY+=OptSpc, "Sala 2");
-		gotoPrintMenu(OptX,mY+=OptSpc, "Sala 3");
+		gotoPrintMenu(OptX,mY, "12:00");
+    	gotoPrintMenu(OptX,mY+=OptSpc, "16:00");
+		gotoPrintMenu(OptX,mY+=OptSpc, "20:00");
 		gotoPrintMenu(OptX,mY+=OptSpc, "Voltar ao menu principal");
-		gotoPrintMenu(10,17, " ========== Nome das peças escolhidas e suas salas =============\n");
+		gotoPrintMenu(10,17, " ========== Nome das peças escolhidas e seus horários =============\n");
 		
 		for(int i=0;i<totalPecas;i++){
-			gotoxy(23,i+20);printf("Sala %d: %s R$ %.2f",i+1, Pecas[i].nome, Pecas[i].valor);	
+			gotoxy(23,i+20);printf("Horário %s: %s R$ %.2f",horarios[i], Pecas[i].nome, Pecas[i].valor);	
 		}
 		
 		OpcaoPeca = newMenuNav(OptFY, OptSpc, OptX, OptTotal);
@@ -213,7 +213,7 @@ void DefinirPecas(){
 			
 			int indPeca = OpcaoPeca-1;
 			
-			gotoxy(20,2);printf(" ========== SALA %d =============\n", OpcaoPeca);
+			gotoxy(20,2);printf(" ========== Horário %s =============\n", horarios[OpcaoPeca]);
 			gotoPrintMenu(20,4, " Insira os dados da peça");
 			gotoPrintMenu(20,6, " Nome: ");
 			cursor(1);
@@ -223,22 +223,19 @@ void DefinirPecas(){
 			cursor(1);
 			scanf("%f", &Pecas[indPeca].valor);
 			
-			gotoPrintMenu(20,8, " Horário: ");
-			cursor(1);
-			scanf("%d:%d" , &Pecas[indPeca].hora,&Pecas[indPeca].minuto);
-			
-			gotoxy(21, 11);printf("SALA %d definida", OpcaoPeca);
+			gotoxy(21, 11);printf("Peça do horário %s definida", horarios[OpcaoPeca]);
 			gotoxy(21, 12);printf("Nome: %s", Pecas[indPeca].nome);
-			gotoxy(21, 13);printf("Valor: R$ %.2f", Pecas[indPeca].valor);
-			gotoxy(21, 14);printf("Hora: %d:%d \n\n\n\n", Pecas[indPeca].hora, Pecas[indPeca].minuto);
+			gotoxy(21, 13);printf("Valor: R$ %.2f \n\n\n", Pecas[indPeca].valor);
+
 			cursor(0);
 			
 			OpcaoPeca = 0;
+			dataBaseSavePecas();
 			system("pause");			
 		}
 	
 	} while(OpcaoPeca<4);
-	dataBaseSavePecas();
+
 }
 
 void VerPecas(){ // menu para ver as peças escolhidas
@@ -254,7 +251,7 @@ void VerPecas(){ // menu para ver as peças escolhidas
 		SetColor(0);
 		
 		gotoxy(8, l+4);
-		printf(" SALA %d às %d:%d                         %.2f", i+1, Pecas[i].hora, Pecas[i].minuto, Pecas[i].valor);
+		printf(" Horário %s                         %.2f", horarios[i], Pecas[i].valor);
 		
 		gotoxy(0, l+6);
 		PrintLugares(Pecas[i].lugares);
@@ -353,10 +350,10 @@ void IngressoSucesso(int peca, int opt = 0, int lugar = 0, int tpIng = 0){
 		gotoxy(18, 2); printf("========= Ingresso comprado com sucesso ===========");
 		ComprarIngressoTicket(peca, lugar, tpIng);
 		lYN = 22;
-		gotoxy(18, 20); printf("Deseja comprar outro ingresso na mesma sala?");
+		gotoxy(18, 20); printf("Deseja comprar outro ingresso no mesmo horário?");
 	} else {
 		gotoxy(15, 2); printf("========= Ingresso cancelado com sucesso ===========");
-		gotoxy(15, 4); printf("Deseja cancelar outro ingresso na mesma sala?");
+		gotoxy(15, 4); printf("Deseja cancelar outro ingresso no mesmo horário?");
 	}
 
 	int response;
@@ -389,12 +386,12 @@ void ComprarIngressoTicket(int peca, int lugar, int tpIng){
 	}
 	gotoxy(20, 4);printf("==============  Ticket %d  =============", id);
 	
-	gotoxy(21,  8);printf("Sala ___________________________ %d", peca);
+	gotoxy(21,  8);printf("Horário ________________________ %s", horarios[peca-1]);
 	gotoxy(21, 10);printf("Peça ___________________________ %s", Pecas[peca-1].nome);
 	gotoxy(21, 12);printf("Poltrona _______________________ %d", lugar);
 	gotoxy(21, 14);printf("Valor __________________________ %.2f", valor);
 	gotoxy(21, 16);printf("Data ___________________________ %d/%d/%d", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900);
-	gotoxy(21, 18);printf("Horário_________________________ %d:%d", Pecas[peca-1].hora, Pecas[peca-1].minuto);
+
 }
 
 void ComprarIngresso(int pc = 0){
