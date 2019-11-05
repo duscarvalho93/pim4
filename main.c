@@ -323,18 +323,36 @@ int escolherPeca(){
 
 int escolherTipoIngresso(){
 	system("cls");
+	
+	time_t t = time(NULL);
+  	struct tm tm = *localtime(&t);
+
+  	int dW = 2;
+  	int OptTotal;
+  		
 	gotoPrintMenu(15,2, " =========== Escolha o tipo do seu ingresso  ===========");
 	int OptX = 33; // Coordenada X que vai começar o print
 	int OptFY = 5; // Coordenada Y para a linha da primeira opção
 	int OptSpc = 3; // Espaçamento entre as opções
-	int OptTotal = 4; // Total de opções do menu
+	if(tm.tm_wday==dW){
+		OptTotal = 4; // Total de opções do menu
+	} else {
+		OptTotal = 3; // Total de opções do menu
+	}
 	int mY = OptFY;                                              
 	gotoxy(OptX,mY);printf("Inteira");
-	gotoxy(OptX,mY+=OptSpc);printf("Meia");
-	gotoxy(OptX,mY+=OptSpc);printf("Crianças Carentes");
+	gotoxy(OptX,mY+=OptSpc);printf("Meia Entrada");
+	if(tm.tm_wday==dW){
+		gotoxy(OptX,mY+=OptSpc);printf("Crianças Carentes");	
+	}
 	gotoxy(OptX,mY+=OptSpc);printf("Voltar ao menu principal");
 	int tpIngresso;
 	tpIngresso = newMenuNav(OptFY, OptSpc, OptX, OptTotal);
+	
+	if(tm.tm_wday!=dW && tpIngresso==3){
+		tpIngresso=4;
+	}
+
 	return tpIngresso;
 }
 
